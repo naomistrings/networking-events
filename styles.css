@@ -198,6 +198,18 @@ form#eventForm {
   justify-content: flex-end;
 }
 
+.page-footer {
+  margin-top: var(--space-11);
+  padding-top: var(--space-6);
+  border-top: var(--border-default);
+  text-align: center;
+}
+
+.page-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 @media (max-width: 720px) {
   .events-table {
     display: none;
