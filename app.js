@@ -44,6 +44,25 @@ function formatDateTime(iso) {
   }
 }
 
+function formatEventDateRange(startIso, endIso) {
+  const startStr = formatDateTime(startIso);
+  if (!endIso) {
+    return startStr;
+  }
+
+  try {
+    const start = new Date(startIso);
+    const end = new Date(endIso);
+    const sameDay = start.toDateString() === end.toDateString();
+    const endStr = sameDay
+      ? end.toLocaleString(undefined, { hour: "numeric", minute: "2-digit" })
+      : formatDateTime(endIso);
+    return `${startStr}–${endStr}`;
+  } catch {
+    return startStr;
+  }
+}
+
 async function loadEvents() {
   listMessage.textContent = "Loading upcoming events...";
   eventsList.innerHTML = "";
@@ -179,7 +198,7 @@ function renderCommentTable(events, commentMap, container, emptyMessage) {
 function renderEventRow(event) {
   const tr = document.createElement("tr");
   const tdDate = document.createElement("td");
-  tdDate.textContent = formatDateTime(event.event_at);
+  tdDate.textContent = formatEventDateRange(event.event_at, event.event_end_at);
   const tdEvent = document.createElement("td");
   if (event.event_url) {
     const a = document.createElement("a");
@@ -222,7 +241,7 @@ function renderEventCard(event) {
 
   const meta = document.createElement("div");
   meta.className = "event-card__meta";
-  meta.textContent = `${formatDateTime(event.event_at)} • ${event.location || "Online"} • ${event.price || ""}`;
+  meta.textContent = `${formatEventDateRange(event.event_at, event.event_end_at)} • ${event.location || "Online"} • ${event.price || ""}`;
 
   card.appendChild(title);
   card.appendChild(meta);
@@ -232,7 +251,7 @@ function renderEventCard(event) {
 function renderEventCommentRow(event, comment, tbody) {
   const row = document.createElement("tr");
   const tdDate = document.createElement("td");
-  tdDate.textContent = formatDateTime(event.event_at);
+  tdDate.textContent = formatEventDateRange(event.event_at, event.event_end_at);
 
   const tdEvent = document.createElement("td");
   const titleGroup = document.createElement("div");
@@ -376,6 +395,7 @@ form.addEventListener("submit", async (e) => {
   const eventName = document.getElementById("eventName").value.trim();
   const eventUrl = document.getElementById("eventUrl").value.trim();
   const eventAtRaw = document.getElementById("eventAt").value;
+  const eventEndAtRaw = document.getElementById("eventEndAt").value;
   const location = document.getElementById("location").value.trim();
   const price = document.getElementById("price").value.trim();
 
@@ -393,6 +413,21 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  let eventEndAt = null;
+  if (eventEndAtRaw) {
+    eventEndAt = new Date(eventEndAtRaw);
+    if (isNaN(eventEndAt.getTime())) {
+      formMessage.className = "theme-text-error";
+      formMessage.textContent = "Please enter a valid end date and time.";
+      return;
+    }
+    if (eventEndAt <= eventAt) {
+      formMessage.className = "theme-text-error";
+      formMessage.textContent = "End time must be after the start time.";
+      return;
+    }
+  }
+
   submitBtn.disabled = true;
   submitBtn.classList.add("theme-btn--loading");
 
@@ -400,6 +435,7 @@ form.addEventListener("submit", async (e) => {
     event_name: eventName,
     event_url: eventUrl || null,
     event_at: eventAt.toISOString(),
+    event_end_at: eventEndAt ? eventEndAt.toISOString() : null,
     location: location || null,
     price: price || null,
   };
