@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Networking Events</title>
+    <link rel="stylesheet" href="theme.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-root theme-page">
+    <div class="theme-container theme-container--wide">
+      <header class="page-header">
+        <h1 class="theme-heading">Networking Events</h1>
+        <button
+          id="toggleFormBtn"
+          type="button"
+          class="theme-btn theme-btn--outline theme-btn--sm"
+        >
+          Add an event
+        </button>
+      </header>
+
+      <main style="margin-top: var(--space-8)">
+        <section
+          id="addEventSection"
+          class="theme-card theme-card--grid hidden"
+          aria-labelledby="add-event-heading"
+        >
+          <div>
+            <h2 id="add-event-heading" class="theme-subheading">
+              Add an event
+            </h2>
+            <p class="theme-subtext">
+              Please include date and time. Past events are filtered out
+              automatically.
+            </p>
+          </div>
+
+          <form id="eventForm" class="theme-card--form" novalidate>
+            <div class="theme-field theme-field--wide">
+              <label class="theme-label" for="eventName">Event name</label>
+              <input
+                id="eventName"
+                name="eventName"
+                class="theme-input"
+                type="text"
+                required
+              />
+            </div>
+
+            <div class="theme-field">
+              <label class="theme-label" for="eventUrl"
+                >Event link (optional)</label
+              >
+              <input
+                id="eventUrl"
+                name="eventUrl"
+                class="theme-input"
+                type="url"
+                placeholder="https://example.com"
+              />
+            </div>
+
+            <div class="theme-field">
+              <label class="theme-label" for="eventAt">Date &amp; time</label>
+              <input
+                id="eventAt"
+                name="eventAt"
+                class="theme-input"
+                type="datetime-local"
+                required
+              />
+            </div>
+
+            <div class="theme-field">
+              <label class="theme-label" for="location">Location</label>
+              <input
+                id="location"
+                name="location"
+                class="theme-input"
+                type="text"
+              />
+            </div>
+
+            <div class="theme-field">
+              <label class="theme-label" for="price">Price</label>
+              <input
+                id="price"
+                name="price"
+                class="theme-input"
+                type="text"
+                placeholder="Free / $10–20"
+              />
+            </div>
+
+            <!-- Honeypot field: bots often fill this. Keep it hidden from users. -->
+            <div class="visually-hidden">
+              <label for="website">Website</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="theme-btn-row">
+              <button
+                id="submitBtn"
+                class="theme-btn theme-btn--block"
+                type="submit"
+              >
+                Submit event
+              </button>
+            </div>
+
+            <div
+              id="formMessage"
+              aria-live="polite"
+              style="margin-top: var(--space-4)"
+            ></div>
+          </form>
+        </section>
+
+        <section style="margin-top: var(--space-9)">
+          <div id="eventsContainer">
+            <h2 class="visually-hidden">Events</h2>
+            <div
+              id="listMessage"
+              class="theme-subtext"
+              style="margin-bottom: var(--space-6)"
+            ></div>
+
+            <div class="theme-card" id="eventsCard">
+              <table
+                id="eventsTable"
+                class="events-table"
+                aria-describedby="listMessage"
+              >
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Location</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody id="eventsList"></tbody>
+              </table>
+
+              <!-- Mobile-friendly list that is shown via CSS on narrow viewports -->
+              <div
+                id="eventsCards"
+                class="events-cards"
+                aria-hidden="true"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <section style="margin-top: var(--space-9)">
+          <div id="lastWeekContainer">
+            <div class="section-header">
+              <h2 class="theme-subheading">Last week’s events</h2>
+            </div>
+            <div id="lastWeekList" class="event-list"></div>
+          </div>
+        </section>
+
+        <section style="margin-top: var(--space-9)">
+          <div class="view-past-commented-row">
+            <a
+              id="viewPastCommentedLink"
+              class="theme-link"
+              href="#pastCommentedSection"
+              >View past events with comments</a
+            >
+          </div>
+          <div
+            id="pastCommentedSection"
+            class="theme-card hidden"
+            style="margin-top: var(--space-5)"
+          >
+            <h2 class="theme-subheading">Past attended events</h2>
+            <div id="pastCommentedList" class="event-list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

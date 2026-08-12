@@ -1,0 +1,222 @@
+/* Page-specific styles that build on theme.css tokens */
+
+:root {
+  --card-gap: var(--space-7);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
+/* Layout for form + list */
+form#eventForm {
+  max-width: 780px;
+}
+
+.hidden {
+  display: none;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.events-heading-row {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Events table for wide screens */
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm-alt);
+}
+.events-table thead th {
+  text-align: left;
+  padding: var(--space-4) var(--space-5);
+  color: var(--color-text-dim);
+  font-weight: var(--font-weight-medium);
+}
+.events-table tbody tr {
+  border-top: var(--border-default);
+}
+.events-table tbody td {
+  padding: var(--space-4) var(--space-5);
+  vertical-align: top;
+}
+.events-table a {
+  color: var(--color-brand-blue);
+  text-decoration: none;
+}
+.events-table tbody tr {
+  transition: background 150ms ease;
+}
+.events-table tbody tr:hover {
+  background: var(--color-input-bg);
+}
+
+/* Cards (mobile view) — hidden on wide screens */
+.events-cards {
+  display: none;
+}
+.event-card {
+  display: block;
+  margin-bottom: var(--space-6);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+  border: var(--border-default);
+}
+.event-card__title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+.event-card__meta {
+  font-size: var(--font-size-sm-alt);
+  color: var(--color-text-dim);
+}
+
+/* Empty state */
+.empty-state {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-dim);
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.event-list {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.event-row-title-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.event-row-title {
+  font-weight: inherit;
+  font-size: inherit;
+  line-height: 1.4;
+}
+
+.event-row-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.event-row-title a:hover {
+  text-decoration: underline;
+}
+
+.event-row-button-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.comment-row.hidden {
+  display: none;
+}
+
+.comment-row-panel {
+  padding: var(--space-3) 0;
+}
+
+.event-comment-text {
+  margin: 0;
+  color: var(--color-text-dim);
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+.event-comment-date {
+  font-size: var(--font-size-sm);
+}
+
+.comment-panel {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  max-width: 100%;
+}
+
+.comment-input {
+  width: 100%;
+  min-height: 70px;
+  background: var(--color-input-bg);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  padding: var(--padding-input);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: flex-end;
+}
+
+.events-table td a,
+.event-card__meta a {
+  color: var(--color-brand-blue);
+  text-decoration: none;
+}
+
+.events-table td a:hover,
+.event-card__meta a:hover {
+  text-decoration: underline;
+}
+
+.view-past-commented-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .events-table {
+    display: none;
+  }
+  .events-cards {
+    display: block;
+  }
+  .theme-container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+/* Small polish */
+.form-inline {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+}
+.muted {
+  color: var(--color-text-dim);
+}

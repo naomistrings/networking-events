@@ -1,0 +1,583 @@
+/*
+  theme.css
+  Reusable design tokens + component classes extracted from the existing
+  inline styles across app/globals.css, app/page.js, app/leaderboard/page.js,
+  and property-intake.jsx.
+
+  Standalone file — not imported anywhere yet. To use it, add
+  `import "../theme.css";` (or copy the tokens) into your own layout/globals.
+*/
+
+:root {
+  /* ---------------------------------------------------------------------
+     Color — brand
+  --------------------------------------------------------------------- */
+  --color-brand-yellow: #FFD10D;
+  --color-brand-blue: #1691D0;
+  --color-brand-green: #8AC660;
+
+  /* Color — surfaces */
+  --color-bg: #0f1117;
+  --color-card: #181b24;
+  --color-input-bg: #12141c;
+  --color-border: #282d3a;
+
+  /* Color — text */
+  --color-text: #e2e4ea;
+  --color-text-dim: #8a8f9e;
+  --color-text-on-accent: #fff;
+  --color-text-on-bright: #1a1a1a; /* text on yellow/green buttons + badges */
+
+  /* Color — semantic */
+  --color-accent: var(--color-brand-blue);
+  --color-danger: #f87171;
+  --color-success: var(--color-brand-green);
+
+  /* Color — derived / translucent (yellow badge background, e.g. "22" = ~13% alpha) */
+  --color-brand-yellow-a13: color-mix(in srgb, var(--color-brand-yellow) 13%, transparent);
+
+  /* ---------------------------------------------------------------------
+     Typography
+  --------------------------------------------------------------------- */
+  --font-family: system-ui, sans-serif;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-sm-alt: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-icon: 32px;
+  --font-size-heading: 26px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --letter-spacing-tight: -0.02em;   /* headings */
+  --letter-spacing-wide: 0.05em;     /* uppercase field labels */
+
+  --line-height-base: normal;
+
+  /* ---------------------------------------------------------------------
+     Spacing scale (values as used throughout the app)
+  --------------------------------------------------------------------- */
+  --space-1: 3px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 10px;
+  --space-6: 12px;
+  --space-7: 16px;
+  --space-8: 20px;
+  --space-9: 24px;
+  --space-10: 28px;
+  --space-11: 32px;
+  --space-12: 40px;
+  --space-13: 48px;
+
+  /* Component-specific padding shorthand values */
+  --padding-input: 8px 12px;
+  --padding-btn: 10px 20px;
+  --padding-btn-sm: 8px 14px;
+  --padding-card: 20px;
+  --padding-dropzone: 40px 20px;
+
+  /* ---------------------------------------------------------------------
+     Border radius
+  --------------------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-pill: 99px;
+  --radius-circle: 50%;
+
+  /* ---------------------------------------------------------------------
+     Borders
+  --------------------------------------------------------------------- */
+  --border-width: 1px;
+  --border-width-thick: 2px;
+  --border-width-spinner: 3px;
+  --border-default: var(--border-width) solid var(--color-border);
+  --border-dashed: var(--border-width-thick) dashed var(--color-border);
+
+  /* ---------------------------------------------------------------------
+     Shadows / glow
+     Note: the existing UI has no elevation box-shadows — cards are
+     differentiated from the background by border + fill color alone.
+     The one shadow-like effect in the codebase is a drop-shadow glow
+     used to celebrate a completed bingo card.
+  --------------------------------------------------------------------- */
+  --shadow-none: none;
+  --glow-celebrate: drop-shadow(0 0 10px var(--color-brand-yellow));
+
+  /* ---------------------------------------------------------------------
+     Motion
+  --------------------------------------------------------------------- */
+  --transition-fast: 0.15s;
+  --transition-base: 0.3s;
+  --transition-width: 0.4s ease;
+  --duration-spin: 0.8s linear infinite;
+  --duration-pulse: 0.45s ease-in-out infinite alternate;
+  --duration-badge: 0.4s ease-out forwards;
+
+  /* ---------------------------------------------------------------------
+     Layout
+  --------------------------------------------------------------------- */
+  --content-max-width: 720px;
+  --content-max-width-wide: 900px;
+}
+
+/* ===========================================================================
+   Base / reset (from app/globals.css)
+=========================================================================== */
+
+.theme-root {
+  color-scheme: dark;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.theme-page {
+  font-family: var(--font-family);
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 100vh;
+  padding: var(--space-11) var(--space-9);
+  box-sizing: border-box;
+}
+
+.theme-container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.theme-container--wide {
+  max-width: var(--content-max-width-wide);
+}
+
+/* ===========================================================================
+   Typography components
+=========================================================================== */
+
+.theme-heading {
+  font-family: var(--font-family);
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-brand-yellow);
+}
+
+.theme-subheading {
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-7);
+  color: var(--color-brand-yellow);
+}
+
+.theme-subtext {
+  font-family: var(--font-family);
+  color: var(--color-text-dim);
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-base);
+}
+
+.theme-link {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm-alt);
+  color: var(--color-brand-blue);
+  text-decoration: none;
+}
+
+.theme-text-error {
+  color: var(--color-danger);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm-alt);
+}
+
+.theme-text-success {
+  color: var(--color-success);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+}
+
+/* ===========================================================================
+   Card
+=========================================================================== */
+
+.theme-card {
+  background: var(--color-card);
+  border-radius: var(--radius-xl);
+  border: var(--border-default);
+  padding: var(--padding-card);
+  box-shadow: var(--shadow-none);
+}
+
+.theme-card + .theme-card,
+.theme-card--stack {
+  margin-top: var(--space-8);
+}
+
+.theme-card--form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+}
+
+.theme-card--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-7);
+}
+
+/* ===========================================================================
+   Form fields
+=========================================================================== */
+
+.theme-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-field--wide {
+  grid-column: 1 / -1;
+}
+
+.theme-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  margin-bottom: var(--space-2);
+  display: block;
+  font-family: var(--font-family);
+}
+
+.theme-input,
+.theme-select,
+.theme-textarea {
+  font-family: var(--font-family);
+  color: var(--color-text);
+  box-sizing: border-box;
+  background: var(--color-input-bg);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--padding-input);
+  font-size: var(--font-size-base);
+  width: 100%;
+  outline: none;
+}
+
+.theme-select {
+  appearance: auto;
+}
+
+.theme-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.theme-textarea--lg {
+  min-height: 80px;
+}
+
+/* Optional focus affordance — no explicit focus style exists in the current
+   app (inputs use outline: none with no replacement); provided as a sane
+   default for reuse. Delete if you want to match current behavior exactly. */
+.theme-input:focus,
+.theme-select:focus,
+.theme-textarea:focus {
+  border-color: var(--color-accent);
+}
+
+/* ===========================================================================
+   Buttons
+=========================================================================== */
+
+.theme-btn {
+  font-family: var(--font-family);
+  color: var(--color-text-on-accent);
+  box-sizing: border-box;
+  background: var(--color-brand-blue);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--padding-btn);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-btn--outline {
+  background: transparent;
+  border: var(--border-default);
+  color: var(--color-text);
+}
+
+.theme-btn--success {
+  background: var(--color-brand-green);
+  color: var(--color-text-on-bright);
+}
+
+.theme-btn--warning {
+  background: var(--color-brand-yellow);
+  color: var(--color-text-on-bright);
+}
+
+.theme-btn--sm {
+  font-size: var(--font-size-sm-alt);
+  padding: var(--padding-btn-sm);
+}
+
+.theme-btn--block {
+  width: 100%;
+}
+
+.theme-btn--flex {
+  flex: 1;
+}
+
+.theme-btn:disabled,
+.theme-btn--loading {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.theme-btn-row {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.theme-btn-bare {
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+}
+
+/* ===========================================================================
+   Badge / tag / pill
+=========================================================================== */
+
+.theme-badge {
+  margin-left: var(--space-4);
+  font-size: var(--font-size-xs);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-yellow-a13);
+  color: var(--color-brand-yellow);
+}
+
+.theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* ===========================================================================
+   Dropzone / upload target
+=========================================================================== */
+
+.theme-dropzone {
+  border: var(--border-dashed);
+  border-radius: var(--radius-lg);
+  padding: var(--padding-dropzone);
+  text-align: center;
+  cursor: pointer;
+}
+
+.theme-dropzone__icon {
+  font-size: var(--font-size-icon);
+  margin-bottom: var(--space-4);
+}
+
+.theme-dropzone__title {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-2);
+}
+
+.theme-dropzone__hint {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm-alt);
+  color: var(--color-text-dim);
+}
+
+/* ===========================================================================
+   Spinner
+=========================================================================== */
+
+.theme-spinner {
+  width: 32px;
+  height: 32px;
+  border: var(--border-width-spinner) solid var(--color-border);
+  border-top-color: var(--color-brand-blue);
+  border-radius: var(--radius-circle);
+  margin: 0 auto var(--space-6);
+  animation: theme-spin var(--duration-spin);
+}
+
+@keyframes theme-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================================================================
+   List row (batch entries / leaderboard rows)
+=========================================================================== */
+
+.theme-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm-alt);
+  font-family: var(--font-family);
+}
+
+.theme-row--zebra {
+  background: var(--color-input-bg);
+}
+
+/* ===========================================================================
+   Combobox / autocomplete dropdown
+=========================================================================== */
+
+.theme-combobox {
+  position: relative;
+}
+
+.theme-combobox__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--color-input-bg);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.theme-combobox__option {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  color: var(--color-text);
+  cursor: pointer;
+  background: transparent;
+}
+
+.theme-combobox__option--active {
+  background: var(--color-border);
+}
+
+.theme-combobox__empty {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--color-input-bg);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-size-sm-alt);
+  color: var(--color-text-dim);
+  font-family: var(--font-family);
+}
+
+/* ===========================================================================
+   Progress bar (leaderboard rank bars)
+=========================================================================== */
+
+.theme-progress-track {
+  flex: 1;
+  background: var(--color-input-bg);
+  border-radius: var(--radius-sm);
+  height: 18px;
+  overflow: hidden;
+}
+
+.theme-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  min-width: 4px;
+  transition: width var(--transition-width);
+  background: var(--color-brand-green);
+}
+
+.theme-progress-fill--lead {
+  background: var(--color-brand-yellow);
+}
+
+/* ===========================================================================
+   Bingo grid + celebration animation
+=========================================================================== */
+
+.theme-bingo-square {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: var(--border-default);
+  background: var(--color-input-bg);
+}
+
+.theme-bingo-square--celebrating {
+  border-color: var(--color-brand-yellow);
+  animation: theme-bingo-pulse var(--duration-pulse);
+}
+
+.theme-bingo-grid--celebrating {
+  filter: var(--glow-celebrate);
+  transition: filter var(--transition-base);
+}
+
+.theme-bingo-badge {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-brand-yellow);
+  margin-top: var(--space-4);
+  font-family: var(--font-family);
+  animation: theme-bingo-badge var(--duration-badge);
+}
+
+@keyframes theme-bingo-pulse {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.6;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes theme-bingo-badge {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
