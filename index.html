@@ -49,6 +49,20 @@
             </div>
 
             <div class="theme-field">
+              <label class="theme-label" for="eventCategory">Category</label>
+              <select
+                id="eventCategory"
+                name="eventCategory"
+                class="theme-select"
+              >
+                <option value="networking">Networking event</option>
+                <option value="trade_show">
+                  Trade show, fair &amp; exhibition
+                </option>
+              </select>
+            </div>
+
+            <div class="theme-field">
               <label class="theme-label" for="eventUrl"
                 >Event link (optional)</label
               >
@@ -195,6 +209,43 @@
           >
             <h2 class="theme-subheading">Past attended events</h2>
             <div id="pastCommentedList" class="event-list"></div>
+          </div>
+        </section>
+
+        <section style="margin-top: var(--space-10)">
+          <div id="tradeShowContainer">
+            <h2 class="theme-heading" style="margin-bottom: var(--space-5)">
+              Trade Shows, Fairs &amp; Exhibitions
+            </h2>
+            <div
+              id="tradeShowListMessage"
+              class="theme-subtext"
+              style="margin-bottom: var(--space-6)"
+            ></div>
+
+            <div class="theme-card" id="tradeShowCard">
+              <table
+                id="tradeShowTable"
+                class="events-table"
+                aria-describedby="tradeShowListMessage"
+              >
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Location</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody id="tradeShowEventsList"></tbody>
+              </table>
+
+              <div
+                id="tradeShowEventsCards"
+                class="events-cards"
+                aria-hidden="true"
+              ></div>
+            </div>
           </div>
         </section>
       </main>

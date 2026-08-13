@@ -8,6 +8,9 @@ const addEventSection = document.getElementById("addEventSection");
 const toggleFormBtn = document.getElementById("toggleFormBtn");
 const eventsList = document.getElementById("eventsList");
 const eventsCards = document.getElementById("eventsCards");
+const tradeShowEventsList = document.getElementById("tradeShowEventsList");
+const tradeShowEventsCards = document.getElementById("tradeShowEventsCards");
+const tradeShowListMessage = document.getElementById("tradeShowListMessage");
 const lastWeekList = document.getElementById("lastWeekList");
 const pastCommentedList = document.getElementById("pastCommentedList");
 const viewPastCommentedLink = document.getElementById("viewPastCommentedLink");
@@ -117,8 +120,11 @@ function buildEventDateCell(startIso, endIso) {
 
 async function loadEvents() {
   listMessage.textContent = "Loading upcoming events...";
+  tradeShowListMessage.textContent = "Loading upcoming trade shows...";
   eventsList.innerHTML = "";
   eventsCards.innerHTML = "";
+  tradeShowEventsList.innerHTML = "";
+  tradeShowEventsCards.innerHTML = "";
   lastWeekList.innerHTML = "";
   pastCommentedList.innerHTML = "";
 
@@ -134,6 +140,7 @@ async function loadEvents() {
     supabase
       .from("events")
       .select("*")
+      .eq("category", "networking")
       .gte("event_at", sevenDaysAgoISO())
       .lt("event_at", startOfTodayISO())
       .order("event_at", { ascending: false }),
@@ -141,9 +148,17 @@ async function loadEvents() {
 
   if (upcomingError || lastWeekError) {
     listMessage.textContent = "Error loading events.";
+    tradeShowListMessage.textContent = "Error loading events.";
     console.error(upcomingError || lastWeekError);
     return;
   }
+
+  const upcomingNetworking = upcomingEvents.filter(
+    (event) => event.category !== "trade_show"
+  );
+  const upcomingTradeShows = upcomingEvents.filter(
+    (event) => event.category === "trade_show"
+  );
 
   const commentMap = {};
   if (lastWeekEvents && lastWeekEvents.length > 0) {
@@ -180,6 +195,7 @@ async function loadEvents() {
   (pastComments || []).forEach((comment) => {
     if (
       !comment.events ||
+      comment.events.category === "trade_show" ||
       new Date(comment.events.event_at) >= new Date(startOfTodayISO()) ||
       seenPastEventIds.has(comment.event_id)
     ) {
@@ -191,16 +207,29 @@ async function loadEvents() {
   });
 
   listMessage.textContent = "";
+  tradeShowListMessage.textContent = "";
 
-  if (!upcomingEvents || upcomingEvents.length === 0) {
+  if (upcomingNetworking.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
     empty.textContent = "No upcoming events — you can add one above.";
     eventsCards.appendChild(empty);
   } else {
-    upcomingEvents.forEach((event) => {
-      renderEventRow(event);
-      renderEventCard(event);
+    upcomingNetworking.forEach((event) => {
+      renderEventRow(event, eventsList);
+      renderEventCard(event, eventsCards);
+    });
+  }
+
+  if (upcomingTradeShows.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No upcoming trade shows — you can add one above.";
+    tradeShowEventsCards.appendChild(empty);
+  } else {
+    upcomingTradeShows.forEach((event) => {
+      renderEventRow(event, tradeShowEventsList);
+      renderEventCard(event, tradeShowEventsCards);
     });
   }
 
@@ -247,7 +276,7 @@ function renderCommentTable(events, commentMap, container, emptyMessage) {
   });
 }
 
-function renderEventRow(event) {
+function renderEventRow(event, targetList) {
   const tr = document.createElement("tr");
   const tdDate = document.createElement("td");
   tdDate.appendChild(buildEventDateCell(event.event_at, event.event_end_at));
@@ -272,10 +301,10 @@ function renderEventRow(event) {
   tr.appendChild(tdEvent);
   tr.appendChild(tdLocation);
   tr.appendChild(tdPrice);
-  eventsList.appendChild(tr);
+  targetList.appendChild(tr);
 }
 
-function renderEventCard(event) {
+function renderEventCard(event, targetCards) {
   const card = document.createElement("div");
   card.className = "event-card";
   const title = document.createElement("div");
@@ -301,7 +330,7 @@ function renderEventCard(event) {
   card.appendChild(title);
   card.appendChild(dateCell);
   card.appendChild(meta);
-  eventsCards.appendChild(card);
+  targetCards.appendChild(card);
 }
 
 function renderEventCommentRow(event, comment, tbody) {
@@ -449,6 +478,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   const eventName = document.getElementById("eventName").value.trim();
+  const category = document.getElementById("eventCategory").value;
   const eventUrl = document.getElementById("eventUrl").value.trim();
   const eventAtRaw = document.getElementById("eventAt").value;
   const eventEndAtRaw = document.getElementById("eventEndAt").value;
@@ -489,6 +519,7 @@ form.addEventListener("submit", async (e) => {
 
   const payload = {
     event_name: eventName,
+    category,
     event_url: eventUrl || null,
     event_at: eventAt.toISOString(),
     event_end_at: eventEndAt ? eventEndAt.toISOString() : null,
