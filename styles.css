@@ -88,9 +88,23 @@ form#eventForm {
   color: var(--color-text);
   margin-bottom: var(--space-3);
 }
+.event-card__date {
+  margin-bottom: var(--space-2);
+}
 .event-card__meta {
   font-size: var(--font-size-sm-alt);
   color: var(--color-text-dim);
+}
+
+/* Date + time display: date on its own line, time range below it */
+.event-date-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ampm {
+  font-size: 0.9em;
 }
 
 /* Empty state */

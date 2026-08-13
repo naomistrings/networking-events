@@ -44,23 +44,75 @@ function formatDateTime(iso) {
   }
 }
 
-function formatEventDateRange(startIso, endIso) {
-  const startStr = formatDateTime(startIso);
-  if (!endIso) {
-    return startStr;
-  }
+function formatDayLabel(date) {
+  const weekday = new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+  }).format(date);
+  const month = new Intl.DateTimeFormat(undefined, { month: "short" }).format(
+    date
+  );
+  return `${weekday} ${month} ${date.getDate()}`;
+}
 
-  try {
-    const start = new Date(startIso);
+function formatTimeParts(date) {
+  const parts = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).formatToParts(date);
+
+  let time = "";
+  let dayPeriod = "";
+  parts.forEach((part) => {
+    if (part.type === "dayPeriod") {
+      dayPeriod = part.value;
+    } else {
+      time += part.value;
+    }
+  });
+
+  return { time: time.trim(), dayPeriod };
+}
+
+function appendTimeWithAmPm(container, date) {
+  const { time, dayPeriod } = formatTimeParts(date);
+  container.appendChild(document.createTextNode(time));
+  if (dayPeriod) {
+    const ampm = document.createElement("span");
+    ampm.className = "ampm";
+    ampm.textContent = ` ${dayPeriod}`;
+    container.appendChild(ampm);
+  }
+}
+
+function buildEventDateCell(startIso, endIso) {
+  const cell = document.createElement("div");
+  cell.className = "event-date-cell";
+  const start = new Date(startIso);
+
+  const dayLine = document.createElement("div");
+  dayLine.className = "event-date-day";
+  dayLine.textContent = formatDayLabel(start);
+  cell.appendChild(dayLine);
+
+  const timeLine = document.createElement("div");
+  timeLine.className = "event-date-time";
+  appendTimeWithAmPm(timeLine, start);
+
+  if (endIso) {
     const end = new Date(endIso);
     const sameDay = start.toDateString() === end.toDateString();
-    const endStr = sameDay
-      ? end.toLocaleString(undefined, { hour: "numeric", minute: "2-digit" })
-      : formatDateTime(endIso);
-    return `${startStr}–${endStr}`;
-  } catch {
-    return startStr;
+    timeLine.appendChild(document.createTextNode(sameDay ? "–" : " – "));
+    if (!sameDay) {
+      timeLine.appendChild(
+        document.createTextNode(`${formatDayLabel(end)}, `)
+      );
+    }
+    appendTimeWithAmPm(timeLine, end);
   }
+
+  cell.appendChild(timeLine);
+  return cell;
 }
 
 async function loadEvents() {
@@ -198,7 +250,7 @@ function renderCommentTable(events, commentMap, container, emptyMessage) {
 function renderEventRow(event) {
   const tr = document.createElement("tr");
   const tdDate = document.createElement("td");
-  tdDate.textContent = formatEventDateRange(event.event_at, event.event_end_at);
+  tdDate.appendChild(buildEventDateCell(event.event_at, event.event_end_at));
   const tdEvent = document.createElement("td");
   if (event.event_url) {
     const a = document.createElement("a");
@@ -239,11 +291,15 @@ function renderEventCard(event) {
     title.textContent = event.event_name;
   }
 
+  const dateCell = buildEventDateCell(event.event_at, event.event_end_at);
+  dateCell.classList.add("event-card__date");
+
   const meta = document.createElement("div");
   meta.className = "event-card__meta";
-  meta.textContent = `${formatEventDateRange(event.event_at, event.event_end_at)} • ${event.location || "Online"} • ${event.price || ""}`;
+  meta.textContent = `${event.location || "Online"} • ${event.price || ""}`;
 
   card.appendChild(title);
+  card.appendChild(dateCell);
   card.appendChild(meta);
   eventsCards.appendChild(card);
 }
@@ -251,7 +307,7 @@ function renderEventCard(event) {
 function renderEventCommentRow(event, comment, tbody) {
   const row = document.createElement("tr");
   const tdDate = document.createElement("td");
-  tdDate.textContent = formatEventDateRange(event.event_at, event.event_end_at);
+  tdDate.appendChild(buildEventDateCell(event.event_at, event.event_end_at));
 
   const tdEvent = document.createElement("td");
   const titleGroup = document.createElement("div");
