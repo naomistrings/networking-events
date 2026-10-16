@@ -30,7 +30,7 @@
             <h2 id="add-event-heading" class="theme-subheading">
               Add an event
             </h2>
-            <p class="theme-subtext">
+            <p id="addEventSubtext" class="theme-subtext">
               Please include date and time. Past events are filtered out
               automatically.
             </p>
@@ -138,6 +138,13 @@
               >
                 Submit event
               </button>
+              <button
+                id="cancelEditBtn"
+                class="theme-btn theme-btn--outline theme-btn--block hidden"
+                type="button"
+              >
+                Cancel edit
+              </button>
             </div>
 
             <div
@@ -169,6 +176,7 @@
                     <th>Event</th>
                     <th>Location</th>
                     <th>Price</th>
+                    <th><span class="visually-hidden">Actions</span></th>
                   </tr>
                 </thead>
                 <tbody id="eventsList"></tbody>
@@ -235,6 +243,7 @@
                     <th>Event</th>
                     <th>Location</th>
                     <th>Price</th>
+                    <th><span class="visually-hidden">Actions</span></th>
                   </tr>
                 </thead>
                 <tbody id="tradeShowEventsList"></tbody>

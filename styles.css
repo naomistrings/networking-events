@@ -151,6 +151,62 @@ form#eventForm {
   justify-content: flex-start;
 }
 
+/* Edit / delete icons: own column on the right of the table,
+   top-right corner of each mobile card */
+.events-table .event-actions-cell {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.event-card {
+  position: relative;
+}
+.event-card .event-actions {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+.event-card__title {
+  padding-right: 56px;
+}
+
+.event-actions {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-dim);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+.icon-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  opacity: 1;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+}
+.icon-btn--danger:hover,
+.icon-btn--danger:focus-visible {
+  color: var(--color-danger);
+}
+
 .comment-row.hidden {
   display: none;
 }

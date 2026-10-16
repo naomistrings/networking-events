@@ -1,5 +1,6 @@
 // Supabase config — safe to expose these in browser because RLS limits anon
-// to the operations allowed by your policies (read + insert only).
+// to the operations allowed by your policies (read, insert, update + delete
+// on events).
 // Replace the placeholders with values from your Supabase project.
 
 export const SUPABASE_URL = "https://ikxgqwrkjslfycnhashi.supabase.co";

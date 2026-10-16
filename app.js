@@ -18,6 +18,12 @@ const pastCommentedSection = document.getElementById("pastCommentedSection");
 const formMessage = document.getElementById("formMessage");
 const listMessage = document.getElementById("listMessage");
 const submitBtn = document.getElementById("submitBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const addEventHeading = document.getElementById("add-event-heading");
+const addEventSubtext = document.getElementById("addEventSubtext");
+
+// Id of the event currently being edited, or null when adding a new event.
+let editingEventId = null;
 
 function startOfTodayISO() {
   const d = new Date();
@@ -296,11 +302,15 @@ function renderEventRow(event, targetList) {
   tdLocation.textContent = event.location || "";
   const tdPrice = document.createElement("td");
   tdPrice.textContent = event.price || "";
+  const tdActions = document.createElement("td");
+  tdActions.className = "event-actions-cell";
+  tdActions.appendChild(buildEventActions(event));
 
   tr.appendChild(tdDate);
   tr.appendChild(tdEvent);
   tr.appendChild(tdLocation);
   tr.appendChild(tdPrice);
+  tr.appendChild(tdActions);
   targetList.appendChild(tr);
 }
 
@@ -330,7 +340,122 @@ function renderEventCard(event, targetCards) {
   card.appendChild(title);
   card.appendChild(dateCell);
   card.appendChild(meta);
+  card.appendChild(buildEventActions(event));
   targetCards.appendChild(card);
+}
+
+const PENCIL_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const TRASH_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+
+function buildIconButton(iconSvg, label) {
+  const btn = document.createElement("button");
+  btn.className = "icon-btn";
+  btn.type = "button";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  btn.innerHTML = iconSvg;
+  return btn;
+}
+
+function buildEventActions(event) {
+  const actions = document.createElement("div");
+  actions.className = "event-actions";
+
+  const editBtn = buildIconButton(PENCIL_ICON, `Edit ${event.event_name}`);
+  editBtn.addEventListener("click", () => startEditingEvent(event));
+
+  const deleteBtn = buildIconButton(TRASH_ICON, `Delete ${event.event_name}`);
+  deleteBtn.classList.add("icon-btn--danger");
+  deleteBtn.addEventListener("click", () => deleteEvent(event));
+
+  actions.appendChild(editBtn);
+  actions.appendChild(deleteBtn);
+  return actions;
+}
+
+// Formats an ISO timestamp as the local "YYYY-MM-DDTHH:mm" value that
+// datetime-local inputs expect.
+function toDateTimeLocalValue(iso) {
+  if (!iso) {
+    return "";
+  }
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours()
+  )}:${pad(d.getMinutes())}`;
+}
+
+function startEditingEvent(event) {
+  editingEventId = event.id;
+
+  document.getElementById("eventName").value = event.event_name || "";
+  document.getElementById("eventCategory").value =
+    event.category || "networking";
+  document.getElementById("eventUrl").value = event.event_url || "";
+  document.getElementById("eventAt").value = toDateTimeLocalValue(
+    event.event_at
+  );
+  document.getElementById("eventEndAt").value = toDateTimeLocalValue(
+    event.event_end_at
+  );
+  document.getElementById("location").value = event.location || "";
+  document.getElementById("price").value = event.price || "";
+
+  addEventHeading.textContent = "Edit event";
+  addEventSubtext.textContent = `Editing “${event.event_name}”. Save your changes or cancel.`;
+  submitBtn.textContent = "Save changes";
+  cancelEditBtn.classList.remove("hidden");
+  formMessage.textContent = "";
+
+  addEventSection.classList.remove("hidden");
+  toggleFormBtn.textContent = "Hide form";
+  addEventSection.scrollIntoView({ behavior: "smooth" });
+  document.getElementById("eventName").focus({ preventScroll: true });
+}
+
+function exitEditMode() {
+  editingEventId = null;
+  form.reset();
+  addEventHeading.textContent = "Add an event";
+  addEventSubtext.textContent =
+    "Please include date and time. Past events are filtered out automatically.";
+  submitBtn.textContent = "Submit event";
+  cancelEditBtn.classList.add("hidden");
+}
+
+async function deleteEvent(event) {
+  const confirmed = window.confirm(
+    `Delete “${event.event_name}”? This can't be undone.`
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  // .select() returns the deleted rows so we can tell when the database
+  // silently refused the delete (Supabase row-level security returns no error).
+  const { data, error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", event.id)
+    .select();
+
+  if (error || !data || data.length === 0) {
+    console.error("Supabase delete error:", error);
+    window.alert(
+      error
+        ? `Couldn't delete the event — ${error.message}`
+        : "Couldn't delete the event — the database didn't allow it. Check the Supabase delete policy."
+    );
+    return;
+  }
+
+  if (editingEventId === event.id) {
+    exitEditMode();
+  }
+  await loadEvents();
 }
 
 function renderEventCommentRow(event, comment, tbody) {
@@ -527,7 +652,28 @@ form.addEventListener("submit", async (e) => {
     price: price || null,
   };
 
-  const { error } = await supabase.from("events").insert([payload]);
+  const isEditing = editingEventId !== null;
+  let error = null;
+
+  if (isEditing) {
+    // .select() returns the updated row so we can tell when the database
+    // silently refused the update (Supabase row-level security returns no error).
+    const { data, error: updateError } = await supabase
+      .from("events")
+      .update(payload)
+      .eq("id", editingEventId)
+      .select();
+    error =
+      updateError ||
+      (!data || data.length === 0
+        ? {
+            message:
+              "the database didn't allow the change. Check the Supabase update policy.",
+          }
+        : null);
+  } else {
+    ({ error } = await supabase.from("events").insert([payload]));
+  }
 
   submitBtn.disabled = false;
   submitBtn.classList.remove("theme-btn--loading");
@@ -535,15 +681,21 @@ form.addEventListener("submit", async (e) => {
   if (error) {
     formMessage.className = "theme-text-error";
     const message = error.message || error.details || JSON.stringify(error);
-    formMessage.textContent = `Failed to submit — ${message}`;
-    console.error("Supabase insert error:", error);
+    formMessage.textContent = `Failed to ${isEditing ? "save" : "submit"} — ${message}`;
+    console.error(`Supabase ${isEditing ? "update" : "insert"} error:`, error);
     return;
   }
 
   formMessage.className = "theme-text-success";
-  formMessage.textContent = "Thanks — your event was submitted.";
+  formMessage.textContent = isEditing
+    ? "Your changes were saved."
+    : "Thanks — your event was submitted.";
 
-  form.reset();
+  if (isEditing) {
+    exitEditMode();
+  } else {
+    form.reset();
+  }
   await loadEvents();
 
   setTimeout(() => {
@@ -554,6 +706,14 @@ form.addEventListener("submit", async (e) => {
 toggleFormBtn.addEventListener("click", () => {
   const isHidden = addEventSection.classList.toggle("hidden");
   toggleFormBtn.textContent = isHidden ? "Add an event" : "Hide form";
+  if (isHidden && editingEventId !== null) {
+    exitEditMode();
+  }
+});
+
+cancelEditBtn.addEventListener("click", () => {
+  exitEditMode();
+  formMessage.textContent = "";
 });
 
 viewPastCommentedLink.addEventListener("click", (event) => {
